@@ -57,7 +57,6 @@ module PostHog
       exc_info = {
         'type' => exception.class.name,
         'value' => exception.message,
-        'module' => get_module_name(exception),
         'mechanism' => {
           'type' => is_cause ? 'chained' : 'generic',
           'handled' => true
@@ -73,19 +72,6 @@ module PostHog
       end
       
       exc_info
-    end
-    
-    def self.get_module_name(exception)
-      # Try to get the module name from the exception class
-      class_name = exception.class.name
-      parts = class_name.split('::')
-      
-      if parts.length > 1
-        # Return the module part (everything except the last part)
-        parts[0...-1].join('::')
-      else
-        nil
-      end
     end
 
     def self.build_stack_frames(backtrace)
