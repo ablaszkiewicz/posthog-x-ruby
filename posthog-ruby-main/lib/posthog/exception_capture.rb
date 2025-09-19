@@ -7,13 +7,13 @@ module PostHog
     def self.build_exception_properties(exception, additional_properties = {})
       exception_list = build_exception_list(exception)
       
-      # todo: should it be array?
-      exception_types = exception_list.map { |exc| exc['type'] }
-      exception_values = exception_list.map { |exc| exc['value'] }
+      # Use only the first exception in the list for type and value
+      exception_type = exception_list.first && exception_list.first['type']
+      exception_value = exception_list.first && exception_list.first['value']
       
       properties = {
-        '$exception_types' => exception_types,
-        '$exception_values' => exception_values,
+        '$exception_type' => exception_type,
+        '$exception_value' => exception_value,
         '$exception_list' => exception_list
       }
       

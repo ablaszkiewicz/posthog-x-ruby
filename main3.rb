@@ -19,3 +19,4 @@ rescue => e
 end
 
 posthog.flush
+
