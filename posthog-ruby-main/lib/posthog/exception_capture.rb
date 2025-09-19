@@ -81,7 +81,7 @@ module PostHog
         function = '<unknown>'
       end
       
-      {
+      frame = {
         'filename' => File.basename(file),
         'abs_path' => file,
         'lineno' => lineno,
@@ -89,6 +89,11 @@ module PostHog
         'in_app' => !is_gem_path?(file),
         'platform' => 'ruby'
       }
+      
+      # Add context lines if the file exists and is readable
+      add_context_lines(frame, file, lineno) if File.exist?(file)
+      
+      frame
     end
 
     def self.is_gem_path?(path)
@@ -96,6 +101,38 @@ module PostHog
       path.include?('/ruby/') ||
       path.include?('/.rbenv/') ||
       path.include?('/.rvm/')
+    end
+    
+    # Adapted from sentry-ruby/lib/sentry/linecache.rb lines 14-20
+    # Adds source code context lines around the error line
+    def self.add_context_lines(frame, file_path, lineno, context_size = 5)
+      begin
+        lines = File.readlines(file_path)
+        return if lines.empty?
+        
+        # Make sure line number is valid
+        return unless lineno > 0 && lineno <= lines.length
+        
+        # Calculate line ranges for context
+        pre_context_start = [lineno - context_size, 1].max
+        post_context_end = [lineno + context_size, lines.length].min
+        
+        # Get the actual error line (convert from 1-indexed to 0-indexed)
+        frame['context_line'] = lines[lineno - 1].chomp
+        
+        # Get pre-context lines (lines before the error)
+        if pre_context_start < lineno
+          frame['pre_context'] = lines[(pre_context_start - 1)...(lineno - 1)].map(&:chomp)
+        end
+        
+        # Get post-context lines (lines after the error)
+        if post_context_end > lineno
+          frame['post_context'] = lines[lineno...(post_context_end)].map(&:chomp)
+        end
+      rescue => e
+        # Silently ignore file read errors
+        # This can happen with eval'd code, temporary files, etc.
+      end
     end
   end
 end
