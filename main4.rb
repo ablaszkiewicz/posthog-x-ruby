@@ -3,6 +3,7 @@
 require 'bundler/setup'
 require 'posthog'
 require 'logger'
+require_relative 'error_simulator'
 
 posthog = PostHog::Client.new({
   api_key: 'phc_VXlGk6yOu3agIn0h7lTmSOECAGWCtJonUJDAN4CexlJ',
@@ -11,12 +12,10 @@ posthog = PostHog::Client.new({
 
 posthog.logger.level = Logger::DEBUG
 
-
 begin
-  raise StandardError, "This is a test2 exception!"
+  ErrorSimulator.simulate_database_error
 rescue => e
   posthog.capture_exception(e, 'test-user-123')
 end
 
 posthog.flush
-
