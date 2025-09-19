@@ -11,9 +11,13 @@ module PostHog
       exception_list = build_exception_list(exception)
       
       # Build the main properties following Python SDK format
+      # Extract types and messages from exception list for backwards compatibility
+      exception_types = exception_list.map { |exc| exc['type'] }
+      exception_values = exception_list.map { |exc| exc['value'] }
+      
       properties = {
-        '$exception_type' => exception.class.name,
-        '$exception_message' => exception.message,
+        '$exception_types' => exception_types,
+        '$exception_values' => exception_values,
         '$exception_list' => exception_list
       }
       
@@ -63,6 +67,7 @@ module PostHog
       # Add stack trace if available
       if exception.backtrace && !exception.backtrace.empty?
         exc_info['stacktrace'] = {
+          'type' => 'raw',
           'frames' => build_stack_frames(exception.backtrace)
         }
       end
