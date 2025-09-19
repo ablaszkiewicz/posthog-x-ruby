@@ -1,3 +1,9 @@
+PATH
+  remote: posthog-ruby-main
+  specs:
+    posthog-ruby (3.2.0)
+      concurrent-ruby (~> 1)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -14,8 +20,6 @@ GEM
     parser (3.3.9.0)
       ast (~> 2.4.1)
       racc
-    posthog-ruby (3.2.0)
-      concurrent-ruby (~> 1)
     prism (1.5.1)
     pry (0.15.2)
       coderay (~> 1.1)
@@ -61,7 +65,7 @@ PLATFORMS
 
 DEPENDENCIES
   minitest (~> 5.0)
-  posthog-ruby (~> 3.2)
+  posthog-ruby!
   pry (~> 0.14)
   rspec (~> 3.0)
   rubocop (~> 1.0)

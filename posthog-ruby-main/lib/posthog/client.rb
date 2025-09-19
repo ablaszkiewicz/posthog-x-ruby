@@ -9,6 +9,7 @@ require 'posthog/send_worker'
 require 'posthog/noop_worker'
 require 'posthog/feature_flags'
 require 'posthog/send_feature_flags_options'
+require 'posthog/exception_capture'
 
 module PostHog
   class Client
@@ -34,6 +35,7 @@ module PostHog
       symbolize_keys!(opts)
 
       opts[:host] ||= 'https://app.posthog.com'
+      @host = opts[:host]
 
       @queue = Queue.new
       @api_key = opts[:api_key]
@@ -142,6 +144,67 @@ module PostHog
       end
 
       enqueue(FieldParser.parse_for_capture(attrs))
+    end
+
+    # Captures an exception as an event
+    #
+    # @param [Exception] exception The exception to capture
+    # @param [String] distinct_id The ID for the user (optional, defaults to 'ruby-exception')
+    # @param [Hash] additional_properties Additional properties to include with the exception event (optional)
+    #
+    # @example
+    #   begin
+    #     risky_operation
+    #   rescue => e
+    #     posthog.capture_exception(e, 'user-123')
+    #   end
+    #
+    # @example With additional properties
+    #   begin
+    #     api_call
+    #   rescue => e
+    #     posthog.capture_exception(e, 'user-123', {
+    #       endpoint: '/api/users',
+    #       method: 'POST'
+    #     })
+    #   end
+    def capture_exception(exception, distinct_id = nil, additional_properties = {})
+      if ENV['POSTHOG_DEBUG']
+        $stderr.puts "\n[PostHog::Client] capture_exception called"
+        $stderr.puts "  Exception: #{exception.class.name}: #{exception.message}"
+        $stderr.puts "  Distinct ID: #{distinct_id || 'ruby-exception'}"
+      end
+      distinct_id ||= 'ruby-exception'
+      
+      # Build the exception properties
+      properties = ExceptionCapture.build_exception_properties(exception, additional_properties)
+      
+      # Add the person URL like Python SDK does
+      host_without_slash = @host.chomp('/')
+      properties['$exception_personURL'] = "#{host_without_slash}/project/#{@api_key}/person/#{distinct_id}"
+      
+      # Prepare the event data
+      event_data = {
+        distinct_id: distinct_id,
+        event: '$exception',
+        properties: properties,
+        timestamp: Time.now
+      }
+      
+      # Debug: Show final event if debugging is enabled
+      if ENV['POSTHOG_DEBUG']
+        require 'json'
+        $stderr.puts "\n[PostHog::Client] Sending exception event:"
+        $stderr.puts JSON.pretty_generate({
+          distinct_id: event_data[:distinct_id],
+          event: event_data[:event],
+          properties_keys: event_data[:properties].keys,
+          timestamp: event_data[:timestamp].iso8601
+        })
+      end
+      
+      # Capture the exception as a $exception event
+      capture(event_data)
     end
 
     # Identifies a user

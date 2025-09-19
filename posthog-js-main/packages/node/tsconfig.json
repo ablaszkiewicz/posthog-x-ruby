@@ -1,9 +1,0 @@
-{
-  "extends": "@posthog-tooling/tsconfig-base",
-  "compilerOptions": {
-    "rootDir": ".",
-    "module": "ESNext",
-    "moduleResolution": "bundler"
-  },
-  "include": ["src/**/*"]
-}

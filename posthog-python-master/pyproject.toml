@@ -1,0 +1,98 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "posthog"
+dynamic = ["version"]
+description = "Integrate PostHog into any python application."
+authors = [{ name = "PostHog", email = "hey@posthog.com" }]
+maintainers = [{ name = "PostHog", email = "hey@posthog.com" }]
+license = { text = "MIT" }
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+    "requests>=2.7,<3.0",
+    "six>=1.5",
+    "python-dateutil>=2.2",
+    "backoff>=1.10.0",
+    "distro>=1.5.0",
+    "typing-extensions>=4.2.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/posthog/posthog-python"
+Repository = "https://github.com/posthog/posthog-python"
+
+[project.optional-dependencies]
+langchain = ["langchain>=0.2.0"]
+dev = [
+    "django-stubs",
+    "lxml",
+    "mypy",
+    "mypy-baseline",
+    "types-mock",
+    "types-python-dateutil",
+    "types-requests",
+    "types-setuptools",
+    "types-six",
+    "pre-commit",
+    "pydantic",
+    "ruff",
+    "setuptools",
+    "packaging",
+    "wheel",
+    "twine",
+    "tomli",
+    "tomli_w",
+]
+test = [
+    "mock>=2.0.0",
+    "freezegun==1.5.1",
+    "coverage",
+    "pytest",
+    "pytest-timeout",
+    "pytest-asyncio",
+    "django",
+    "openai",
+    "anthropic",
+    "langgraph>=0.4.8",
+    "langchain-core>=0.3.65",
+    "langchain-community>=0.3.25",
+    "langchain-openai>=0.3.22",
+    "langchain-anthropic>=0.3.15",
+    "google-genai",
+    "pydantic",
+    "parameterized>=0.8.1",
+]
+
+[tool.setuptools]
+packages = [
+    "posthog",
+    "posthog.ai",
+    "posthog.ai.langchain",
+    "posthog.ai.openai",
+    "posthog.ai.anthropic",
+    "posthog.ai.gemini",
+    "posthog.test",
+    "posthog.integrations",
+]
+
+[tool.setuptools.dynamic]
+version = { attr = "posthog.version.VERSION" }
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"

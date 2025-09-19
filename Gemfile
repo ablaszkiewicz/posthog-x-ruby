@@ -5,7 +5,8 @@ source 'https://rubygems.org'
 ruby '3.3.0' # Adjust this to your Ruby version if needed
 
 # Core gems
-gem 'posthog-ruby', '~> 3.2'  # PostHog analytics and feature flags
+# Use the local modified version of posthog-ruby with exception capture
+gem 'posthog-ruby', path: './posthog-ruby-main'
 
 # Development dependencies
 group :development do

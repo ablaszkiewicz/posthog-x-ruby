@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+# Using the local modified version of posthog-ruby with exception capture
+require 'bundler/setup'
 require 'posthog'
 require 'logger'
 
@@ -12,23 +14,25 @@ posthog = PostHog::Client.new({
 # Enable debug logging
 posthog.logger.level = Logger::DEBUG
 
+puts "Testing PostHog Ruby SDK - Exception Capture"
+puts "=" * 50
 
-# Send a simple event with error handling
+# Capture a simple exception
 begin
-  posthog.capture({
-    distinct_id: 'user-123',
-    event: 'button_clicked',
-    properties: {
-      button_name: 'signup',
-      timestamp: Time.now.iso8601
-    }
-  })
-  
-  
-  # Force flush to ensure event is sent immediately
-  posthog.flush
-  
+  # Intentionally cause an error
+  raise StandardError, "This is a test exception!"
 rescue => e
-  puts "Error sending event: #{e.message}"
-  puts "Error backtrace: #{e.backtrace.first(5).join("\n")}"
+  puts "\nCaught exception: #{e.class.name}: #{e.message}"
+  puts "Sending to PostHog..."
+  
+  # Capture the exception with PostHog
+  posthog.capture_exception(e, 'test-user-123')
+  
+  puts "Exception sent!"
 end
+
+# Flush to ensure the event is sent immediately
+puts "\nFlushing..."
+posthog.flush
+
+puts "Done! Check your PostHog dashboard for the $exception event."
