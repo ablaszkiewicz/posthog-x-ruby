@@ -1,0 +1,33 @@
+name: Unit Tests
+
+on:
+  - pull_request
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby-version: [3.2, 3.3, 3.4]
+      fail-fast: false
+    env:
+      RAILS_ENV: test
+      GH_ACTIONS_UNIT_TESTS: 1
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Ruby ${{ matrix.ruby-version }}
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby-version }}
+          # runs 'bundle install' and caches installed gems automatically
+          bundler-cache: true
+
+      - name: Run RSpec tests
+        run: |
+          bundle exec rspec
+
+      - name: Run Rubocop
+        run: |
+          bundle exec rubocop

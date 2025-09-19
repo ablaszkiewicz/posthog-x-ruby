@@ -1,0 +1,9 @@
+*.gem
+Gemfile.lock
+coverage/
+.bundle
+vendor/bundle
+.idea
+.ruby-version
+.env
+

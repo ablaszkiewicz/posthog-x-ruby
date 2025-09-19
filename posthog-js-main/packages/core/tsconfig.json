@@ -1,0 +1,20 @@
+{
+  "extends": "@posthog-tooling/tsconfig-base",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "dist",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "isolatedModules": true,
+    "composite": false,
+    "declaration": true,
+    "declarationMap": true,
+    "target": "ES2022",
+    // DOM should be removed here
+    "lib": ["ES2022", "DOM"],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src/**/*"]
+}

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+#/ Usage: bin/test [<configuration>]
+#/ Description: Runs all the rspec tests.
+source bin/helpers/_utils.sh
+set_source_and_root_dir
+
+# Use RUBYLIB to avoid bundler dependency issues
+# This allows tests to run even if bundler can't resolve all dev dependencies
+RUBYLIB=lib rspec "$@"
