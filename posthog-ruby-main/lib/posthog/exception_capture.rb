@@ -72,20 +72,11 @@ module PostHog
       module_name = match[4]  # Optional module/class name
       method_name = match[5]  # Actual method name
       
-      # Clean up method name and handle nil case
-      if method_name
-        method_name = method_name.gsub(/[`']/, '')  # Remove quotes/backticks
-        # Combine module and method if module exists
-        function = module_name ? "#{module_name}##{method_name}" : method_name
-      else
-        function = '<unknown>'
-      end
-      
       frame = {
         'filename' => File.basename(file),
         'abs_path' => file,
         'lineno' => lineno,
-        'function' => function,
+        'function' => method_name,
         'in_app' => !is_gem_path?(file),
         'platform' => 'ruby'
       }
